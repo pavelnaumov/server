@@ -19,7 +19,8 @@
     "pg": "^7.11.0",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.9.2",
-    "sequelize-cli": "^5.5.0"
+    "sequelize-cli": "^5.5.0",
+    "validator": "^11.1.0"
   },
   "devDependencies": {
     "@babel/preset-es2017": "^7.0.0-beta.53",

@@ -7,9 +7,9 @@ const router = express.Router();
  * Select the post by ID
  */
 
-router.get(":id", (req, res) => {
+router.get("/:id", (req, res) => {
   const id = req.params.id;
-  models.Post.find({ where: { id } }).then(post => {
+  models.Post.findAll({ where: { id } }).then(post => {
     if (post) res.json({ success: true, post });
     else res.status(400).json({ success: false, error: "Post not found" });
   });
@@ -19,16 +19,11 @@ router.get(":id", (req, res) => {
  * Save new post
  */
 
-router.post("/new_post", (req, res) => {
+router.post("/", (req, res) => {
   let { title, body } = req.body;
-  models.Post.create({ title, body }).then(post => {
-    res
-      .json({ success: true, post })
-      .catch(err =>
-        res.status(400).json({ success: false, errors: { globals: err } })
-      );
-     
-  });
+  models.Post.create({ title, body })
+    .then(post => res.json({ success: true, post: res.body }))
+    .catch(err => res.status(422).send({ error: err }));
 });
 
 /**
@@ -37,8 +32,8 @@ router.post("/new_post", (req, res) => {
 
 router.put("/:id", (req, res) => {
   const { id, title, body } = req.body;
-  models.Post.update({ title, body }, { where: id })
-    .then(() => res.json({ success: true }))
+  models.Post.update({ title, body }, { where: { id } })
+    .then(post => res.json({ success: true, post }))
     .catch(err =>
       res.status(400).json({ success: false, errors: { globals: err } })
     );
@@ -57,25 +52,12 @@ router.delete("/:id", (req, res) => {
     );
 });
 
-router.get('/', (req, res) => {
-  models.Post.findAll()
-  .then((response) => {
-    res.send(response)
-  })
-})
-
-/**
- * Testing home
- */
-
-const home = (req, res) => {
-  res.json({
-    posts: [
-      { title: "Test title", body: "Test post body" },
-      { title: "Second test title", body: "Test post body" }
-    ]
+router.get("/", (req, res) => {
+  models.Post.findAll({
+    order: [["updatedAt", "ASC"]]
+  }).then(response => {
+    res.send(response);
   });
-};
+});
 
-// export default { home, getPost, createPost, updatePost, deletePost };
 export default router;
