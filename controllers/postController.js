@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get("/:id", (req, res) => {
   const id = req.params.id;
-  models.Post.findAll({ where: { id } }).then(post => {
+  models.Post.findOne({ where: { id } }).then(post => {
     if (post) res.json({ success: true, post });
     else res.status(400).json({ success: false, error: "Post not found" });
   });
