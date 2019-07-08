@@ -2,33 +2,47 @@ import express from "express";
 import session from "express-session";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-// import { home, createPost } from "./routes/posts";
-import posts from './controllers/postController';
+import passport from "passport";
+import cookieSession from 'cookie-session';
 
+import userRoutes from './routes/userRouter';
+import postRoutes from "./routes/postRoutes";
+import authRoutes from "./routes/authRoutes";
+import secret from "./config/secret";
 import models from "./models";
 
 const app = express();
 
-// Cookie Parser
+// Passport Config
+
+require("./config/passport")(passport);
+
+// Cookies
 app.use(cookieParser());
+app.use(cookieSession({
+  maxAge: 24 * 60 * 60 * 1000,
+  keys: [secret.cookieSession.cookie]
+}));
+
+
 
 // Body Parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Express Session
+// app.use(
+//   session({ secret: secret.jwtSecret, resave: true, saveUninitialized: true })
+// );
+
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Routes
-app.use("/api/posts", posts);
-
-
-// Middleware for errors
-// app.use((req, res) => {
-//   res.status(404).json({
-//     errors: {
-//       global:
-//         "Still working on it. Please try again later when we implement it."
-//     }
-//   });
-// });
+app.use("/api/posts", postRoutes);
+app.use('/api/users', userRoutes);
+app.use("/api/auth", authRoutes);
 
 // Sync database with Models
 models.sequelize
