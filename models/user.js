@@ -12,6 +12,9 @@ export default (sequelize, DataTypes) => {
 
   User.associate = models => {
     models.User.hasMany(models.Post);
+    models.User.belongsToMany(User, { as: 'Friends', through: 'friends' });
+    models.User.belongsToMany(User, { as: 'Requestees', through: 'friendRequests', foreignKey: 'requesterId', onDelete: 'CASCADE'});
+    models.User.belongsToMany(User, { as: 'Requesters', through: 'friendRequests', foreignKey: 'requesteeId', onDelete: 'CASCADE'});
   };
 
   return User;

@@ -5,9 +5,9 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import cookieSession from 'cookie-session';
 
-import posts from "./controllers/postController";
-import users from "./controllers/userController";
-import auth from "./controllers/authController";
+import userRoutes from './routes/userRouter';
+import postRoutes from "./routes/postRoutes";
+import authRoutes from "./routes/authRoutes";
 import secret from "./config/secret";
 import models from "./models";
 
@@ -40,9 +40,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use("/api/posts", posts);
-app.use("/api/users", users);
-app.use("/api/auth", auth);
+app.use("/api/posts", postRoutes);
+app.use('/api/users', userRoutes);
+app.use("/api/auth", authRoutes);
 
 // Sync database with Models
 models.sequelize

@@ -1,15 +1,12 @@
-import express from "express";
 import models from "../models";
 import bCrypt from "bcrypt-nodejs";
 import passport from "passport";
 
-const router = express.Router();
 
-// Login
-
-
-// Register Logic
-router.post("/register", (req, res) => {
+/**
+ * Registering users
+ */
+const registerUser = (req, res) => {
   let { email, password, passwordConfirm } = req.body;
   let errors = [];
 
@@ -24,7 +21,7 @@ router.post("/register", (req, res) => {
     errors.push({ message: "The passwords should match" });
     res.json({ message: "The passwords should match" });
   }
-  
+
   // password of 6 char min
   else if (password.length < 6) {
     errors.push({ message: "Password should be at least 6 characters" });
@@ -47,17 +44,11 @@ router.post("/register", (req, res) => {
       }
     });
   }
-});
+};
 
-router.get("/bad", (req, res) => {
-  res.json({ message: "FUCKING" });
-});
-
-// Register Page
-
-router.get("/works", (req, res) => {
-  res.json({ message: "WORKS" });
-});
+/**
+ * Checking whether the user has already logged in
+ */
 
 const authCheck = (req, res, next) => {
   if (!req.user) {
@@ -67,32 +58,53 @@ const authCheck = (req, res, next) => {
   }
 };
 
-router.get("/profile", authCheck, (req, res) => {
+/**
+ * Profile page
+ */
+
+const profile = (req, res) => {
   res.json({ user: req.user });
-});
+}
 
-router.get("/login", (req, res) => {
+/**
+ * Guardian page
+ */
+
+const login = (req, res) => {
   res.send({ message: "Need to login" });
-});
+};
 
-router.get("/usersIndex", (req, res) => {
+/**
+ * Getting all the users -- testing purposes
+ */
+
+const userIndex = (req, res) => {
   models.User.findAll().then(users => {
     res.send({ users });
   });
-});
+}
 
-router.post("/login", (req, res, next) => {
+/**
+ * Logging user with Passport
+ */
+
+const userLogin = (req, res, next) => {
   passport.authenticate("local", {
-    successRedirect: "/api/users/works",
-    failureRedirect: "/api/users/bad"
+    successRedirect: "/api/users/profile",
+    failureRedirect: "/api/users/login"
   })(req, res, next);
-});
 
-// Logout
-router.get("/logout", (req, res) => {
+}
+
+/**
+ * Logging the user out
+ */
+
+const userLogout = (req, res) => {
   req.logout();
   res.send({ message: "Successfully logged out" });
   res.redirect("/works");
-});
+}
 
-export default router;
+
+export default { registerUser, authCheck, profile, userIndex, userLogin, login, userLogout };
