@@ -1,21 +1,24 @@
 import passportLocal from "passport-local";
+import passportGoogle from "passport-google-oauth20";
 import models from "../models";
 import bCrypt from "bcrypt-nodejs";
+import secret from "./secret";
 
 const LocalStrategy = passportLocal.Strategy;
+const GoogleStrategy = passportGoogle.Strategy;
 
 module.exports = passport => {
+  // Local Strategy
+
   passport.use(
     new LocalStrategy(
       { usernameField: "email", passwordField: "password" },
       (email, password, done) => {
         // Match User
         models.User.findOne({ where: { email } })
-
           .then(user => {
             console.log(`hit the Local Strategy, ${user.id}`);
             if (!user) {
-              console.log("email not registered");
               return done(null, false, {
                 message: "That email is not registered"
               });
@@ -40,15 +43,46 @@ module.exports = passport => {
     )
   );
 
+  // Google Strategy
+
+  passport.use(
+    new GoogleStrategy(
+      {
+        callbackURL: "/api/auth/google/redirect",
+        clientID: secret.googleAuth.clientID,
+        clientSecret: secret.googleAuth.clientSecret
+      },
+      (accessToken, refreshToken, profile, done) => {
+        models.User.findOne({ where: { googleID: profile.id } }).then(user => {
+          if (user) {
+            console.log(`USER EXISTS. It is : ${user}`);
+            done(null, user);
+          } else {
+            const { givenName, familyName } = profile.name;
+            models.User.create({
+              firstName: givenName,
+              lastName: familyName,
+              googleID: profile.id
+            })
+              .then(user => {
+                console.log(user);
+                done(null, user);
+              })
+              .catch(err => console.log(err));
+            done(null, user);
+          }
+        });
+      }
+    )
+  );
+
   passport.serializeUser((user, done) => {
-    console.log(`hit the serializing, ${user.id}`);
     done(null, user.id);
   });
 
   passport.deserializeUser((id, done) => {
     models.User.findOne({ where: { id } })
       .then(user => {
-        console.log("deserializing user:", user);
         done(null, user);
       })
       .catch(err => {

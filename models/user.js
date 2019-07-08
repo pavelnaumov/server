@@ -4,9 +4,10 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true
     },
-    password: {
-        type: DataTypes.STRING
-    }
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
+    password: DataTypes.STRING,
+    googleID: DataTypes.STRING
   });
 
   User.associate = models => {

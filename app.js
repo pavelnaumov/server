@@ -3,18 +3,18 @@ import session from "express-session";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import passport from "passport";
-import posts from "./controllers/postController";
-import users from './controllers/userController';
-import strategies from "./config/passport.js";
-import secret from "./config/secret";
 
+import posts from "./controllers/postController";
+import users from "./controllers/userController";
+import auth from "./controllers/authController";
+import secret from "./config/secret";
 import models from "./models";
 
 const app = express();
 
 // Passport Config
 
-require('./config/passport')(passport);
+require("./config/passport")(passport);
 
 // Cookie Parser
 app.use(cookieParser());
@@ -32,13 +32,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Load passport strategies
-strategies(passport, models.user);
-
 // Routes
 app.use("/api/posts", posts);
-app.use('/api/users', users)
-
+app.use("/api/users", users);
+app.use("/api/auth", auth);
 
 // Sync database with Models
 models.sequelize

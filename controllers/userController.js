@@ -46,11 +46,11 @@ router.post("/register", (req, res) => {
         bCrypt.genSalt(10, (err, salt) => {
           bCrypt.hash(password, salt, null, (err, hash) => {
             password = hash;
-            models.User.create({ email, password }).then(user => {
-              res
-                .json({ success: true, user })
-                .catch(err => res.json({ err: res.body }));
-            });
+            models.User.create({ email, password })
+              .then(user => {
+                res.json({ success: true, user });
+              })
+              .catch(() => res.json({ err: res.body }));
           });
         });
       }
@@ -69,7 +69,6 @@ router.post("/login", (req, res, next) => {
     successRedirect: "/api/users/works",
     failureRedirect: "/api/users/bad"
   })(req, res, next);
-  console.log("I am being executed");
 });
 
 // Logout
