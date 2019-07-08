@@ -53,6 +53,7 @@ module.exports = passport => {
         clientSecret: secret.googleAuth.clientSecret
       },
       (accessToken, refreshToken, profile, done) => {
+        console.log(profile);
         models.User.findOne({ where: { googleID: profile.id } }).then(user => {
           if (user) {
             console.log(`USER EXISTS. It is : ${user}`);

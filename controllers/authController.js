@@ -12,16 +12,18 @@ router.get("/", (req, res) => {
 router.get(
   "/google",
   passport.authenticate("google", {
-    scope: ["profile"]
+    scope: ["profile", "email"]
   })
 );
 
 router.get("/logout", (req, res) => {
-  res.send("logout with Google");
+  req.logout();
+  res.redirect('/api/users/login')
 });
 
-router.get("/google/redirect", passport.authenticate('google'), (req, res) => {
-  res.send({ message: "Successfully Logged In with Google" });
+router.get("/google/redirect", passport.authenticate("google"), (req, res) => {
+  res.redirect("/api/users/profile");
 });
+
 
 export default router;

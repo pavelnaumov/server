@@ -1,12 +1,13 @@
 import Sequelize from "sequelize";
 
 const sequelize = new Sequelize("social_network", "postgres", "123456", {
-    dialect: 'postgres'
+  dialect: "postgres"
 });
 
 const models = {
   User: sequelize.import("./user"),
-  Post: sequelize.import("./post")
+  Post: sequelize.import("./post"),
+  Comment: sequelize.import("./comment")
 };
 
 Object.keys(models).forEach(modelName => {

@@ -7,15 +7,6 @@ const router = express.Router();
 
 // Login
 
-router.get("/bad", (req, res) => {
-  res.json({ message: "FUCKING" });
-});
-
-// Register Page
-
-router.get("/works", (req, res) => {
-  res.json({ message: "WORKS" });
-});
 
 // Register Logic
 router.post("/register", (req, res) => {
@@ -33,7 +24,7 @@ router.post("/register", (req, res) => {
     errors.push({ message: "The passwords should match" });
     res.json({ message: "The passwords should match" });
   }
-
+  
   // password of 6 char min
   else if (password.length < 6) {
     errors.push({ message: "Password should be at least 6 characters" });
@@ -58,6 +49,32 @@ router.post("/register", (req, res) => {
   }
 });
 
+router.get("/bad", (req, res) => {
+  res.json({ message: "FUCKING" });
+});
+
+// Register Page
+
+router.get("/works", (req, res) => {
+  res.json({ message: "WORKS" });
+});
+
+const authCheck = (req, res, next) => {
+  if (!req.user) {
+    res.redirect("/api/users/login");
+  } else {
+    next();
+  }
+};
+
+router.get("/profile", authCheck, (req, res) => {
+  res.json({ user: req.user });
+});
+
+router.get("/login", (req, res) => {
+  res.send({ message: "Need to login" });
+});
+
 router.get("/usersIndex", (req, res) => {
   models.User.findAll().then(users => {
     res.send({ users });
@@ -72,7 +89,6 @@ router.post("/login", (req, res, next) => {
 });
 
 // Logout
-
 router.get("/logout", (req, res) => {
   req.logout();
   res.send({ message: "Successfully logged out" });
